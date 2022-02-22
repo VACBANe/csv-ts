@@ -1,33 +1,35 @@
-import './App.css';
+import styled from 'styled-components';
 import { SetStateAction, useEffect, useState } from 'react';
 import Papa from 'papaparse';
+
+import './App.css';
 import DragAndDrop from './DragAndDrop';
 import changeDateFormat from './utils/ChangeDateFormat';
-import styled from 'styled-components';
+import Header from './components/Header';
+import { Block } from './components/Block';
+import { ContractBlock, ContractText } from './components/Contract';
+import HoursAndDollars from './components/HoursAndDollars';
+import TotalRow from './components/TotalRow';
+import Person from './components/Person';
+import DatesFunc from './components/DatesFunc';
+import { Contract, IPerson } from './@types/types';
 
-interface Person {
-    name: string;
-    id: string;
-    contracts: Contract[];
-    total: number;
-}
-interface Contract {
-    name: string;
-    id: string;
-    dates: Day[];
-    total: number;
-}
-interface Day {
-    date: number;
-    hours: string;
-    money: string;
-}
 function App() {
     const [selectedFile, setSelectedFile] = useState();
     const [data, setData] = useState<any[]>([]);
     const [personsAndContracts, setPersonsAndContracts] = useState<any[]>([]);
-    const [week, setWeek] = useState([0, 0, 0, 0, 0, 0, 0]);
+    const [week, setWeek] = useState([
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+    ]); //сумма по дням
     const daysInWeek = [1, 2, 3, 4, 5, 6, 7];
+
+    //берем файл в драгндропа
     useEffect(() => {
         if (selectedFile) {
             Papa.parse(selectedFile, {
@@ -46,12 +48,15 @@ function App() {
             });
         uniquePersons = [...new Set(uniquePersons)];
         let personsObjects: any[] = [];
+        //создаем обьекты юзеров
         uniquePersons.forEach((person) => {
             personsObjects.push({
                 id: person.match(/\(\w+\)/)![0].replace(/[()]/g, ''),
                 name: person.replace(/\(\w+\)/, ' ').trim(),
                 contracts: [],
-                total: 0,
+                totalMoney: 0,
+                totalHours: 0,
+                avatar: 'https://html5css.ru/css/img_lights.jpg',
             });
         });
         data &&
@@ -61,19 +66,28 @@ function App() {
                         person.name === item[1].replace(/\(\w+\)/, ' ').trim()
                     ) {
                         let element = person.contracts.find(
-                            (i: Person) =>
+                            (i: IPerson) =>
                                 i.name ===
                                 item[2].replace(/\(\w+\)/, ' ').trim()
                         );
                         if (element) {
                             element.dates.push({
-                                date: new Date(item[0]).getDay(),
-                                hours: item[3],
+                                date: item[0],
+                                hours: (+item[3]).toFixed(2),
                                 money: item[4],
                             });
-                            element.total = (+element.total + +item[4]).toFixed(
-                                2
-                            );
+                            element.totalMoney = (
+                                +element.totalMoney + +item[4]
+                            ).toFixed(2);
+                            person.totalMoney = (
+                                +person.totalMoney + +item[4]
+                            ).toFixed(2);
+                            element.totalHours = (
+                                +element.totalHours + +item[3]
+                            ).toFixed(2);
+                            person.totalHours = (
+                                +person.totalHours + +item[3]
+                            ).toFixed(2);
                         } else {
                             person.contracts.push({
                                 name: item[2].replace(/\(\w+\)/, ' ').trim(),
@@ -82,13 +96,20 @@ function App() {
                                     .replace(/[()]/g, ''),
                                 dates: [
                                     {
-                                        date: new Date(item[0]).getDay(),
-                                        hours: item[3],
+                                        date: item[0],
+                                        hours: (+item[3]).toFixed(2),
                                         money: item[4],
                                     },
                                 ],
-                                total: item[4] ? item[4] : 0,
+                                totalMoney: item[4] ? item[4] : 0,
+                                totalHours: item[3] ? (+item[3]).toFixed(2) : 0,
                             });
+                            person.totalMoney = (
+                                +person.totalMoney + +item[4]
+                            ).toFixed(2);
+                            person.totalHours = (
+                                +person.totalHours + +(+item[3]).toFixed(2)
+                            ).toFixed(2);
                         }
                     }
                 });
@@ -97,31 +118,32 @@ function App() {
         setPersonsAndContracts(personsObjects);
     }, [data]);
 
-    const DatesFunc = (contract: Contract, day: number) => {
-        let element = contract.dates.find((item) => item.date === day);
-        return element ? (
-            <td className={'hours_and_money'}>
-                {element.hours && parseFloat(element.hours).toFixed(2) + 'h'}{' '}
-                {element.hours && element.money && '/'}{' '}
-                {element.money && element.money + '$'}
-            </td>
-        ) : (
-            <td></td>
-        );
-    };
-    const calculateSum = (personsNContracts: Person[]) => {
-        let tempWeek = [0, 0, 0, 0, 0, 0, 0];
+    const calculateSum = (personsNContracts: IPerson[]) => {
+        let tempWeek = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+        ];
         personsNContracts.forEach((item) => {
             item.contracts.forEach((contract) => {
                 daysInWeek.forEach((day) => {
-                    let element = contract.dates.find(
+                    let element;
+                    element = contract.dates.find(
                         (item) => item.date === day
                     );
                     if (element) {
-                        let sum = tempWeek[day - 1];
-                        tempWeek[day - 1] = Number(
-                            (+sum + Number(element.money)).toFixed(2)
-                        );
+                        let sumMoney = tempWeek[day - 1][0];
+                        let sumHours = tempWeek[day - 1][1];
+                        tempWeek[day - 1][0] = +(
+                            +sumMoney + Number(element.money)
+                        ).toFixed(2);
+                        tempWeek[day - 1][1] = +(
+                            +sumHours + Number(element.hours)
+                        ).toFixed(2);
                     }
                 });
             });
@@ -139,71 +161,61 @@ function App() {
             {selectedFile && (
                 <TableWrapper>
                     <tbody>
-                        <tr>
-                            <th>Person</th>
-                            <th>Contract</th>
-                            <th>Mon</th>
-                            <th>Tue</th>
-                            <th>Wed</th>
-                            <th>Thu</th>
-                            <th>Fri</th>
-                            <th>Sat</th>
-                            <th>Sun</th>
-                            <th>Total</th>
-                        </tr>
-                        {personsAndContracts.map((item) => (
-                            <>
-                                {item.contracts.map(
-                                    (contract: Contract, index: number) => {
-                                        return (
-                                            <tr>
-                                                {index === 0 ? (
-                                                    <td
-                                                        className={'name'}
-                                                        rowSpan={
-                                                            item.contracts
-                                                                .length
-                                                        }
-                                                    >
-                                                        {item.name}
-                                                    </td>
-                                                ) : (
-                                                    ''
-                                                )}
-                                                <td className={'contract'}>
+                        <Header />
+                        {personsAndContracts.map((item) => {
+                            return item.contracts.map(
+                                (contract: Contract, index: number) => {
+                                    return (
+                                        <tr key={index}>
+                                            <Person index={index} item={item} />
+                                            <ContractBlock>
+                                                <ContractText>
                                                     {contract.name}
-                                                </td>
-                                                {daysInWeek.map((day) =>
-                                                    DatesFunc(contract, day)
-                                                )}
-                                                <td>{contract.total}</td>
-                                            </tr>
-                                        );
-                                    }
-                                )}
-                            </>
-                        ))}
-                        <tr>
-                            <td colSpan={2} className={'name'}>
-                                Total $
-                            </td>
-                            {week.map((item) => (
-                                <td>{item}</td>
-                            ))}
-                            <td>
-                                {week
-                                    .reduce((prev, curr) => +prev + +curr)
-                                    .toFixed(2)}
-                            </td>
-                        </tr>
+                                                </ContractText>
+                                            </ContractBlock>
+                                            {daysInWeek.map((day, index) =>
+                                                DatesFunc(contract, day, index)
+                                            )}
+                                            <Block
+                                                colSpan={
+                                                    item.contracts.length === 1
+                                                        ? 2
+                                                        : 1
+                                                }
+                                            >
+                                                <HoursAndDollars
+                                                    time={contract.totalHours}
+                                                    money={contract.totalMoney}
+                                                />
+                                            </Block>
+                                            {item.contracts.length ===
+                                            1 ? null : index === 0 ? (
+                                                <Block
+                                                    rowSpan={
+                                                        item.contracts.length
+                                                    }
+                                                >
+                                                    <HoursAndDollars
+                                                        time={item.totalHours}
+                                                        money={item.totalMoney}
+                                                    />
+                                                </Block>
+                                            ) : null}
+                                        </tr>
+                                    );
+                                }
+                            );
+                        })}
+                        <TotalRow week={week} />
                     </tbody>
                 </TableWrapper>
             )}
         </div>
     );
 }
+
 const TableWrapper = styled.table`
-    max-width: 1024px;
+    width: 1024px;
     margin: 0 auto;
 `;
 export default App;

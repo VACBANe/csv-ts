@@ -4,7 +4,8 @@ const changeDateFormat = (data: any[]) => {
         let temp = item[0][0];
         item[0][0] = item[0][1];
         item[0][1] = temp;
-        item[0] = item[0].join('.');
+        let day = new Date(item[0].join('')).getDay();
+        item[0] = day === 0 ? 7 : day;
         return item;
     });
 };

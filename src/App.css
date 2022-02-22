@@ -1,46 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope&family=Roboto:wght@400;700&display=swap');
 .App {
-  text-align: center;
+    text-align: center;
+    padding: 120px 0;
 }
 * {
-
+    margin: 0;
+    padding: 0;
 }
 body {
-  width: 100vw;
-  height: 100vh;
+    height: 100vh;
+    width: 100vw;
 }
-
 table {
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 th {
-  padding: 10px 0;
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  background: #F2F2F2;
-  align-items: center;
-  min-width: 73px;
+    background: #f2f2f2;
+    align-items: center;
 }
-td, th {
-  border: 1px solid #B9B9B9;
-}
-
-.name {
-  padding-left: 8px;
-  text-align: start;
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-}
-.contract {
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  text-align: start;
-}
-
-.hours_and_money {
-  font-family: 'Manrope', sans-serif;
-  font-size: 12px;
-  line-height: 16px;
+td,
+th {
+    border: 1px solid #b9b9b9;
 }
