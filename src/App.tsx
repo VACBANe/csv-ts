@@ -4,21 +4,22 @@ import Papa from 'papaparse';
 
 import './App.css';
 import DragAndDrop from './DragAndDrop';
-import changeDateFormat from './utils/ChangeDateFormat';
+import changeDateAndTimeFormat from './utils/ChangeDateAndTimeFormat';
 import Header from './components/Header';
-import { Block } from './components/Block';
-import { ContractBlock, ContractText } from './components/Contract';
+import { ContractBlock } from './components/ContractBlock';
 import HoursAndDollars from './components/HoursAndDollars';
 import TotalRow from './components/TotalRow';
 import Person from './components/Person';
 import DatesFunc from './components/DatesFunc';
-import { Contract, IPerson } from './@types/types';
+import { IContract, IPerson } from './@types/types';
+import sumTimes from './utils/sumTimes';
 
 function App() {
     const [selectedFile, setSelectedFile] = useState();
     const [data, setData] = useState<any[]>([]);
     const [personsAndContracts, setPersonsAndContracts] = useState<any[]>([]);
-    const [week, setWeek] = useState([
+    const [weekMoney, setWeekMoney] = useState([0, 0, 0, 0, 0, 0, 0]);
+    const [weekHours, setWeekHours] = useState([
         [0, 0],
         [0, 0],
         [0, 0],
@@ -26,7 +27,7 @@ function App() {
         [0, 0],
         [0, 0],
         [0, 0],
-    ]); //сумма по дням
+    ]);
     const daysInWeek = [1, 2, 3, 4, 5, 6, 7];
 
     //берем файл в драгндропа
@@ -34,8 +35,7 @@ function App() {
         if (selectedFile) {
             Papa.parse(selectedFile, {
                 complete: function (results) {
-                    setData(changeDateFormat(results.data));
-                    setData(results.data);
+                    setData(changeDateAndTimeFormat(results.data));
                 },
             });
         }
@@ -55,8 +55,8 @@ function App() {
                 name: person.replace(/\(\w+\)/, ' ').trim(),
                 contracts: [],
                 totalMoney: 0,
-                totalHours: 0,
-                avatar: 'https://html5css.ru/css/img_lights.jpg',
+                totalHours: [0, 0],
+                avatar: 'https://pm1.narvii.com/6785/fb370186e45f0d4c31605c1f16e3ed61104c8c0bv2_hq.jpg',
             });
         });
         data &&
@@ -73,7 +73,7 @@ function App() {
                         if (element) {
                             element.dates.push({
                                 date: item[0],
-                                hours: (+item[3]).toFixed(2),
+                                hours: item[3],
                                 money: item[4],
                             });
                             element.totalMoney = (
@@ -82,12 +82,14 @@ function App() {
                             person.totalMoney = (
                                 +person.totalMoney + +item[4]
                             ).toFixed(2);
-                            element.totalHours = (
-                                +element.totalHours + +item[3]
-                            ).toFixed(2);
-                            person.totalHours = (
-                                +person.totalHours + +item[3]
-                            ).toFixed(2);
+                            element.totalHours = sumTimes(
+                                element.totalHours,
+                                item[3]
+                            );
+                            person.totalHours = sumTimes(
+                                person.totalHours,
+                                item[3]
+                            );
                         } else {
                             person.contracts.push({
                                 name: item[2].replace(/\(\w+\)/, ' ').trim(),
@@ -97,19 +99,20 @@ function App() {
                                 dates: [
                                     {
                                         date: item[0],
-                                        hours: (+item[3]).toFixed(2),
+                                        hours: item[3],
                                         money: item[4],
                                     },
                                 ],
                                 totalMoney: item[4] ? item[4] : 0,
-                                totalHours: item[3] ? (+item[3]).toFixed(2) : 0,
+                                totalHours: item[3] ? item[3] : [0, 0],
                             });
                             person.totalMoney = (
                                 +person.totalMoney + +item[4]
                             ).toFixed(2);
-                            person.totalHours = (
-                                +person.totalHours + +(+item[3]).toFixed(2)
-                            ).toFixed(2);
+                            person.totalHours = sumTimes(
+                                person.totalHours,
+                                item[3]
+                            );
                         }
                     }
                 });
@@ -119,7 +122,7 @@ function App() {
     }, [data]);
 
     const calculateSum = (personsNContracts: IPerson[]) => {
-        let tempWeek = [
+        let tempWeekHours = [
             [0, 0],
             [0, 0],
             [0, 0],
@@ -128,27 +131,28 @@ function App() {
             [0, 0],
             [0, 0],
         ];
+        let tempWeekMoney = [0, 0, 0, 0, 0, 0, 0];
         personsNContracts.forEach((item) => {
             item.contracts.forEach((contract) => {
                 daysInWeek.forEach((day) => {
                     let element;
-                    element = contract.dates.find(
-                        (item) => item.date === day
-                    );
+                    element = contract.dates.find((item) => item.date === day);
                     if (element) {
-                        let sumMoney = tempWeek[day - 1][0];
-                        let sumHours = tempWeek[day - 1][1];
-                        tempWeek[day - 1][0] = +(
+                        let sumMoney = tempWeekMoney[day - 1];
+                        let sumHours = tempWeekHours[day - 1];
+                        tempWeekMoney[day - 1] = +(
                             +sumMoney + Number(element.money)
                         ).toFixed(2);
-                        tempWeek[day - 1][1] = +(
-                            +sumHours + Number(element.hours)
-                        ).toFixed(2);
+                        tempWeekHours[day - 1] = sumTimes(
+                            sumHours,
+                            element.hours
+                        );
                     }
                 });
             });
         });
-        setWeek(tempWeek);
+        setWeekMoney(tempWeekMoney);
+        setWeekHours(tempWeekHours);
     };
     return (
         <div className="App">
@@ -164,19 +168,17 @@ function App() {
                         <Header />
                         {personsAndContracts.map((item) => {
                             return item.contracts.map(
-                                (contract: Contract, index: number) => {
+                                (contract: IContract, index: number) => {
                                     return (
                                         <tr key={index}>
                                             <Person index={index} item={item} />
                                             <ContractBlock>
-                                                <ContractText>
-                                                    {contract.name}
-                                                </ContractText>
+                                                <div>{contract.name}</div>
                                             </ContractBlock>
                                             {daysInWeek.map((day, index) =>
                                                 DatesFunc(contract, day, index)
                                             )}
-                                            <Block
+                                            <td
                                                 colSpan={
                                                     item.contracts.length === 1
                                                         ? 2
@@ -187,10 +189,10 @@ function App() {
                                                     time={contract.totalHours}
                                                     money={contract.totalMoney}
                                                 />
-                                            </Block>
+                                            </td>
                                             {item.contracts.length ===
                                             1 ? null : index === 0 ? (
-                                                <Block
+                                                <td
                                                     rowSpan={
                                                         item.contracts.length
                                                     }
@@ -199,14 +201,14 @@ function App() {
                                                         time={item.totalHours}
                                                         money={item.totalMoney}
                                                     />
-                                                </Block>
+                                                </td>
                                             ) : null}
                                         </tr>
                                     );
                                 }
                             );
                         })}
-                        <TotalRow week={week} />
+                        <TotalRow weekHours={weekHours} weekMoney={weekMoney} />
                     </tbody>
                 </TableWrapper>
             )}

@@ -25,7 +25,7 @@ const Avatar = styled.img`
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    padding: 5px 8px;
+    padding: 8px;
 `;
 const Name = styled.div`
     font-family: 'Roboto', sans-serif;

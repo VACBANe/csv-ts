@@ -5,22 +5,23 @@ import HoursAndDollars from './HoursAndDollars';
 import styled from 'styled-components';
 
 interface Props {
-    week: number[][];
+    weekMoney: number[];
+    weekHours: number[][]
 }
 
-const TotalRow: React.FC<Props> = ({ week }) => {
+const TotalRow: React.FC<Props> = ({ weekMoney, weekHours }) => {
     return (
         <tr>
             <NameBlock>
                 <TotalRowBlock>Total $</TotalRowBlock>
             </NameBlock>
             <td>{null}</td>
-            {week.map((item, index) => (
+            {weekMoney.map((item, index) => (
                 <td key={index}>
-                    <HoursAndDollars time={item[1]} money={item[0]} />
+                    <HoursAndDollars time={weekHours[index]} money={item} />
                 </td>
             ))}
-            <TotalForTheWeek week={week} />
+            <TotalForTheWeek weekMoney={weekMoney} weekHours={weekHours} />
         </tr>
     );
 };

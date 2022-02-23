@@ -1,20 +1,20 @@
 export interface IPerson {
     name: string;
     id: string;
-    contracts: Contract[];
-    totalHours: number;
+    contracts: IContract[];
+    totalHours: number[];
     totalMoney: number;
     avatar: string;
 }
-export interface Contract {
+export interface IContract {
     name: string;
     id: string;
-    dates: Day[];
-    totalHours: number;
+    dates: IDay[];
+    totalHours: number[];
     totalMoney: number;
 }
-export interface Day {
+export interface IDay {
     date: number;
-    hours: string;
+    hours: number[];
     money: string;
 }

@@ -2,27 +2,21 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface Props {
-    time?: string | number;
+    time?: number[];
     money?: string | number;
 }
 
 const HoursAndDollars: React.FC<Props> = ({ time, money }) => {
-    let t, m;
-    console.log(time)
-    if (time) {
-        let timestamp = +(+time).toFixed(2) * 60;
-        // let temptimestamp = timestamp * 60 * 1000;
-        // timestamp = (Math.floor(temptimestamp/(60*1000)) *(60*1000))/60000;//округление
-        let hours = Math.trunc(timestamp / 60);
-        let minutes = (timestamp % 60).toFixed();
-        if(+minutes < 10) minutes = '0' + minutes
-        if (hours === 0) {
-            if (+minutes !== 0) t = `0:${minutes}`;
+    let t,m;
+    if(time) {
+
+        if(time[1] === 0) {
+            if(time[0] !== 0) t = time[0] + ':' + time[1] + '0'
         } else {
-            t = +minutes !== 0 ? `${hours}:${minutes}` : hours;
+            t = time[0] + ':' + time[1]
         }
     }
-    if (money !== undefined) {
+    if (money) {
         m = Number(money).toFixed(2);
         if (typeof money === 'string')
             if (m.split('.')[1] === '00') m = m.split('.')[0];

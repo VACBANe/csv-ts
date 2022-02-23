@@ -1,19 +1,20 @@
 import React from 'react';
-import { Block } from './Block';
 import HoursAndDollars from "./HoursAndDollars";
+import sumTimes from "../utils/sumTimes";
 
 interface Props {
-    week: number[][];
+    weekMoney: number[];
+    weekHours: number[][]
 }
 
-const TotalForTheWeek: React.FC<Props> = ({ week }) => {
+const TotalForTheWeek: React.FC<Props> = ({ weekMoney, weekHours }) => {
     return (
-        <Block colSpan={2}>
+        <td colSpan={2}>
             <HoursAndDollars
-                time={week.reduce((prev, curr) => +prev + +curr[1], 0)}
-                money={week.reduce((prev, curr) => +prev + +curr[0], 0)}
+                time={weekHours.reduce((prev, curr) => sumTimes(prev, curr), [0,0])}
+                money={weekMoney.reduce((prev, curr) => +prev + +curr, 0)}
             />
-        </Block>
+        </td>
     );
 };
 

@@ -1,14 +1,13 @@
 import React from 'react';
-import { Block } from './Block';
 import HoursAndDollars from './HoursAndDollars';
-import { Contract } from '../@types/types';
+import { IContract } from '../@types/types';
 
-const DatesFunc = (contract: Contract, day: number, index: number) => {
+const DatesFunc = (contract: IContract, day: number, index: number) => {
     let element = contract.dates.find((item) => item.date === day);
     return element ? (
-        <Block key={index}>
+        <td key={index}>
             <HoursAndDollars time={element.hours} money={element.money} />
-        </Block>
+        </td>
     ) : (
         <td key={index}>{null}</td>
     );
