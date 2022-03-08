@@ -11,13 +11,19 @@ import HoursAndDollars from './components/HoursAndDollars';
 import TotalRow from './components/TotalRow';
 import Person from './components/Person';
 import DatesFunc from './components/DatesFunc';
-import { IContract, IPerson } from './@types/types';
+import {IContract, IDataBase, IPerson, IVacations} from './@types/types';
 import sumTimes from './utils/sumTimes';
+// @ts-ignore
+import blob from './hello.csv';
+import { GetDateInterval } from './utils/GetDateInterval';
+import { FormatVacations } from './utils/FormatVacations';
 
 function App() {
     const [selectedFile, setSelectedFile] = useState();
     const [data, setData] = useState<any[]>([]);
-    const [personsAndContracts, setPersonsAndContracts] = useState<any[]>([]);
+    const [personsAndContracts, setPersonsAndContracts] = useState<Array<IPerson>>([]);
+    const [database, setDataBase] = useState<IDataBase>({});
+    const [vacations, setVacations] = useState<IVacations>();
     const [weekMoney, setWeekMoney] = useState([0, 0, 0, 0, 0, 0, 0]);
     const [weekHours, setWeekHours] = useState([
         [0, 0],
@@ -29,12 +35,72 @@ function App() {
         [0, 0],
     ]);
     const daysInWeek = [1, 2, 3, 4, 5, 6, 7];
-
+    const findObj = (id: string) => {
+        if (database[id]?.avatar) {
+            return database[id].avatar;
+        } else return null;
+    };
+    const findId = (id: string) => {
+        if (database[id]?.adminId) {
+            return database[id].adminId;
+        } else return '0';
+    };
+    useEffect(() => {
+        Papa.parse(blob, {
+            download: true,
+            complete: function (input) {
+                const records = input.data;
+                const tempdatabase: any = {};
+                records.forEach((person: any) => {
+                    tempdatabase[person[0]] = {
+                        name: person[2],
+                        avatar: person[3],
+                        adminId: person[1],
+                    };
+                });
+                setDataBase(tempdatabase);
+            },
+        });
+    }, []);
     //берем файл в драгндропа
     useEffect(() => {
         if (selectedFile) {
             Papa.parse(selectedFile, {
-                complete: function (results) {
+                complete: async function (results) {
+                    setVacations(
+                        FormatVacations({
+                            vacations: [
+                                {
+                                    _id: '61e957e46c2ff30012eb6db7',
+                                    userId: '6113c82119e5740011288e41',
+                                    status: 'approved',
+                                    startDate: '2022-01-20',
+                                    endDate: '2022-01-21',
+                                    comment: 'нужно в больницу пойти',
+                                    deleted: false,
+                                },
+                            ],
+                            holidays: [
+                                {
+                                    name: 'InternationalWomanDay',
+                                    date: '19/01/2022',
+                                },
+                            ],
+                            sickLeaves: [
+                                {
+                                    _id: '61ea78656c2ff30012eb7667',
+                                    userId: '5f57b9c9b642eb0017808883',
+                                    date: '2022-01-21',
+                                    comment: 'Пфайзер догнал меня ',
+                                    deleted: false,
+                                    isViewed: true,
+                                },
+                            ],
+                        })
+                    );
+                    await GetDateInterval(results.data).then((res) => {
+                        res && setVacations(FormatVacations(res));
+                    });
                     setData(changeDateAndTimeFormat(results.data));
                 },
             });
@@ -47,16 +113,18 @@ function App() {
                 uniquePersons.push(item[1]);
             });
         uniquePersons = [...new Set(uniquePersons)];
-        let personsObjects: any[] = [];
+        const personsObjects: any[] = [];
         //создаем обьекты юзеров
         uniquePersons.forEach((person) => {
+            const personId = person.match(/\(\w+\)/)![0].replace(/[()]/g, '');
             personsObjects.push({
-                id: person.match(/\(\w+\)/)![0].replace(/[()]/g, ''),
+                id: personId,
                 name: person.replace(/\(\w+\)/, ' ').trim(),
                 contracts: [],
                 totalMoney: 0,
                 totalHours: [0, 0],
-                avatar: 'https://pm1.narvii.com/6785/fb370186e45f0d4c31605c1f16e3ed61104c8c0bv2_hq.jpg',
+                avatar: findObj(personId),
+                adminId: findId(personId),
             });
         });
         data &&
@@ -65,7 +133,7 @@ function App() {
                     if (
                         person.name === item[1].replace(/\(\w+\)/, ' ').trim()
                     ) {
-                        let element = person.contracts.find(
+                        const element = person.contracts.find(
                             (i: IPerson) =>
                                 i.name ===
                                 item[2].replace(/\(\w+\)/, ' ').trim()
@@ -120,9 +188,9 @@ function App() {
         calculateSum(personsObjects);
         setPersonsAndContracts(personsObjects);
     }, [data]);
-
+    console.log(vacations)
     const calculateSum = (personsNContracts: IPerson[]) => {
-        let tempWeekHours = [
+        const tempWeekHours = [
             [0, 0],
             [0, 0],
             [0, 0],
@@ -131,15 +199,14 @@ function App() {
             [0, 0],
             [0, 0],
         ];
-        let tempWeekMoney = [0, 0, 0, 0, 0, 0, 0];
+        const tempWeekMoney = [0, 0, 0, 0, 0, 0, 0];
         personsNContracts.forEach((item) => {
             item.contracts.forEach((contract) => {
                 daysInWeek.forEach((day) => {
-                    let element;
-                    element = contract.dates.find((item) => item.date === day);
+                    const element = contract.dates.find((item) => item.date === day);
                     if (element) {
-                        let sumMoney = tempWeekMoney[day - 1];
-                        let sumHours = tempWeekHours[day - 1];
+                        const sumMoney = tempWeekMoney[day - 1];
+                        const sumHours = tempWeekHours[day - 1];
                         tempWeekMoney[day - 1] = +(
                             +sumMoney + Number(element.money)
                         ).toFixed(2);
@@ -165,10 +232,11 @@ function App() {
             {selectedFile && (
                 <TableWrapper>
                     <tbody>
-                        <Header />
+                        {vacations && <Header vacations={vacations} />}
                         {personsAndContracts.map((item) => {
                             return item.contracts.map(
                                 (contract: IContract, index: number) => {
+                                    const contractNum = index;
                                     return (
                                         <tr key={index}>
                                             <Person index={index} item={item} />
@@ -176,7 +244,14 @@ function App() {
                                                 <div>{contract.name}</div>
                                             </ContractBlock>
                                             {daysInWeek.map((day, index) =>
-                                                DatesFunc(contract, day, index)
+                                                DatesFunc(
+                                                    contract,
+                                                    day,
+                                                    item.adminId,
+                                                    vacations,
+                                                    index,
+                                                    contractNum
+                                                )
                                             )}
                                             <td
                                                 colSpan={
@@ -208,7 +283,7 @@ function App() {
                                 }
                             );
                         })}
-                        <TotalRow weekHours={weekHours} weekMoney={weekMoney} />
+                        <TotalRow weekHours={weekHours} weekMoney={weekMoney} vacations={vacations}/>
                     </tbody>
                 </TableWrapper>
             )}

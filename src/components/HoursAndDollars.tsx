@@ -7,13 +7,12 @@ interface Props {
 }
 
 const HoursAndDollars: React.FC<Props> = ({ time, money }) => {
-    let t,m;
-    if(time) {
-
-        if(time[1] === 0) {
-            if(time[0] !== 0) t = time[0] + ':' + time[1] + '0'
+    let t, m;
+    if (time) {
+        if (time[1] === 0) {
+            if (time[0] !== 0) t = time[0] + ':' + time[1] + '0';
         } else {
-            t = time[0] + ':' + time[1]
+            t = time[0] + ':' + time[1];
         }
     }
     if (money) {

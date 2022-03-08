@@ -1,18 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
+import VacationBlock from './VacationBlock';
 
-const Header = () => {
+interface Props {
+    vacations: any;
+}
+
+const Header: React.FC<Props> = ({ vacations }) => {
+    const daysInWeek = [1, 2, 3, 4, 5, 6, 7];
+    const arrOfDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const checkHolidays = () => {
+        return daysInWeek.map((day, index) => {
+            let holiday = false;
+            let holidayName = '';
+            vacations &&
+                vacations.holidays &&
+                vacations.holidays.forEach((it: any) => {
+                    if (
+                        (new Date(it.date).getDay() === 0
+                            ? 7
+                            : new Date(it.date).getDay()) === day
+                    ) {
+                        holiday = true;
+                        holidayName = it.name;
+                    }
+                });
+            return holiday ? (
+                <VacationBlock vacation={holidayName} key={index}>
+                    {arrOfDays[index]}
+                </VacationBlock>
+            ) : (
+                <HeaderCol key={index}>{arrOfDays[index]}</HeaderCol>
+            );
+        });
+    };
     return (
         <HeaderRow>
             <th>Person</th>
             <th>Contract</th>
-            <HeaderCol>Mon</HeaderCol>
-            <HeaderCol>Tue</HeaderCol>
-            <HeaderCol>Wed</HeaderCol>
-            <HeaderCol>Thu</HeaderCol>
-            <HeaderCol>Fri</HeaderCol>
-            <HeaderCol>Sat</HeaderCol>
-            <HeaderCol>Sun</HeaderCol>
+            {checkHolidays()}
             <th colSpan={2}>Total</th>
         </HeaderRow>
     );

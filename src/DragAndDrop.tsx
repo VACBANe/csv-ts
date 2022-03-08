@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 class DragAndDrop extends Component<{}, { drag: boolean }> {
     dragCounter: number;
     constructor(props: any) {
@@ -41,14 +42,14 @@ class DragAndDrop extends Component<{}, { drag: boolean }> {
         }
     }
     componentDidMount() {
-        let el = document.body;
+        const el = document.body;
         el.addEventListener('dragenter', (event) => this.handleDragIn(event));
         el.addEventListener('dragleave', (event) => this.handleDragOut(event));
         el.addEventListener('dragover', (event) => this.handleDrag(event));
         el.addEventListener('drop', (event) => this.handleDrop(event));
     }
     componentWillUnmount() {
-        let el = document.body;
+        const el = document.body;
         el.removeEventListener('dragenter', (event) =>
             this.handleDragIn(event)
         );

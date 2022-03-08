@@ -11,27 +11,35 @@ const Person: React.FC<Props> = ({ index, item }) => {
         <>
             {index === 0 && (
                 <NameBlock rowSpan={item.contracts.length}>
-                    <Name>
-                        <Avatar src={item.avatar} />
-                        {item.name}
+                    <Name avatarSrc={item.avatar}>
+                        <Avatar src={item.avatar} avatarSrc={item.avatar} />
+                        <div style={{display:'flex', flexDirection: 'column'}}>
+                            <div>{item.name}</div>
+                            {!item.avatar && <Id>id: {item.id}</Id>}
+                        </div>
                     </Name>
                 </NameBlock>
             )}
         </>
     );
 };
-
-const Avatar = styled.img`
+const Id = styled.div`
+  color: red;
+  font-size: 11px;
+`;
+const Avatar = styled.img<{ avatarSrc: string | null }>`
+    border: ${({ avatarSrc }) => (avatarSrc ? '' : '1px solid red')};
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    padding: 8px;
+    margin: 8px;
 `;
-const Name = styled.div`
+const Name = styled.div<{ avatarSrc: string | null }>`
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
     font-size: 12px;
     line-height: 14px;
+  color: ${({ avatarSrc }) => (avatarSrc ? '' : 'red')};
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
