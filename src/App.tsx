@@ -11,17 +11,21 @@ import HoursAndDollars from './components/HoursAndDollars';
 import TotalRow from './components/TotalRow';
 import Person from './components/Person';
 import DatesFunc from './components/DatesFunc';
-import {IContract, IDataBase, IPerson, IVacations} from './@types/types';
+import { IContract, IDataBase, IPerson, IVacations } from './@types/types';
 import sumTimes from './utils/sumTimes';
 // @ts-ignore
 import blob from './hello.csv';
 import { GetDateInterval } from './utils/GetDateInterval';
 import { FormatVacations } from './utils/FormatVacations';
 
+type dataType = Array<[number, string, string, number[], string]>;
+
 function App() {
     const [selectedFile, setSelectedFile] = useState();
-    const [data, setData] = useState<any[]>([]);
-    const [personsAndContracts, setPersonsAndContracts] = useState<Array<IPerson>>([]);
+    const [data, setData] = useState<dataType>([]);
+    const [personsAndContracts, setPersonsAndContracts] = useState<
+        Array<IPerson>
+    >([]);
     const [database, setDataBase] = useState<IDataBase>({});
     const [vacations, setVacations] = useState<IVacations>();
     const [weekMoney, setWeekMoney] = useState([0, 0, 0, 0, 0, 0, 0]);
@@ -50,8 +54,9 @@ function App() {
             download: true,
             complete: function (input) {
                 const records = input.data;
-                const tempdatabase: any = {};
-                records.forEach((person: any) => {
+                const tempdatabase: IDataBase = {};
+                // @ts-ignore
+                records.forEach((person: string[]) => {
                     tempdatabase[person[0]] = {
                         name: person[2],
                         avatar: person[3],
@@ -113,10 +118,11 @@ function App() {
                 uniquePersons.push(item[1]);
             });
         uniquePersons = [...new Set(uniquePersons)];
-        const personsObjects: any[] = [];
+        const personsObjects: IPerson[] = [];
         //создаем обьекты юзеров
         uniquePersons.forEach((person) => {
-            const personId = person.match(/\(\w+\)/)![0].replace(/[()]/g, '');
+            // @ts-ignore
+            const personId = person.match(/\(\w+\)/)[0].replace(/[()]/g, '');
             personsObjects.push({
                 id: personId,
                 name: person.replace(/\(\w+\)/, ' ').trim(),
@@ -127,6 +133,7 @@ function App() {
                 adminId: findId(personId),
             });
         });
+        console.log(personsObjects);
         data &&
             data.forEach((item) => {
                 personsObjects.forEach((person) => {
@@ -134,7 +141,7 @@ function App() {
                         person.name === item[1].replace(/\(\w+\)/, ' ').trim()
                     ) {
                         const element = person.contracts.find(
-                            (i: IPerson) =>
+                            (i) =>
                                 i.name ===
                                 item[2].replace(/\(\w+\)/, ' ').trim()
                         );
@@ -144,10 +151,10 @@ function App() {
                                 hours: item[3],
                                 money: item[4],
                             });
-                            element.totalMoney = (
+                            element.totalMoney = +(
                                 +element.totalMoney + +item[4]
                             ).toFixed(2);
-                            person.totalMoney = (
+                            person.totalMoney = +(
                                 +person.totalMoney + +item[4]
                             ).toFixed(2);
                             element.totalHours = sumTimes(
@@ -161,6 +168,7 @@ function App() {
                         } else {
                             person.contracts.push({
                                 name: item[2].replace(/\(\w+\)/, ' ').trim(),
+                                // @ts-ignore
                                 id: item[2]
                                     .match(/\(\w+\)/)[0]
                                     .replace(/[()]/g, ''),
@@ -174,7 +182,7 @@ function App() {
                                 totalMoney: item[4] ? item[4] : 0,
                                 totalHours: item[3] ? item[3] : [0, 0],
                             });
-                            person.totalMoney = (
+                            person.totalMoney = +(
                                 +person.totalMoney + +item[4]
                             ).toFixed(2);
                             person.totalHours = sumTimes(
@@ -188,7 +196,6 @@ function App() {
         calculateSum(personsObjects);
         setPersonsAndContracts(personsObjects);
     }, [data]);
-    console.log(vacations)
     const calculateSum = (personsNContracts: IPerson[]) => {
         const tempWeekHours = [
             [0, 0],
@@ -203,7 +210,9 @@ function App() {
         personsNContracts.forEach((item) => {
             item.contracts.forEach((contract) => {
                 daysInWeek.forEach((day) => {
-                    const element = contract.dates.find((item) => item.date === day);
+                    const element = contract.dates.find(
+                        (item) => item.date === day
+                    );
                     if (element) {
                         const sumMoney = tempWeekMoney[day - 1];
                         const sumHours = tempWeekHours[day - 1];
@@ -283,7 +292,11 @@ function App() {
                                 }
                             );
                         })}
-                        <TotalRow weekHours={weekHours} weekMoney={weekMoney} vacations={vacations}/>
+                        <TotalRow
+                            weekHours={weekHours}
+                            weekMoney={weekMoney}
+                            vacations={vacations}
+                        />
                     </tbody>
                 </TableWrapper>
             )}

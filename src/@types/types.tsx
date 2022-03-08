@@ -5,14 +5,14 @@ export interface IPerson {
     contracts: IContract[];
     totalHours: number[];
     totalMoney: number;
-    avatar: string;
+    avatar: string| null;
 }
 export interface IContract {
     name: string;
     id: string;
     dates: IDay[];
     totalHours: number[];
-    totalMoney: number;
+    totalMoney: number| string;
 }
 export interface IDay {
     date: number;
