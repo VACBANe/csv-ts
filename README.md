@@ -1,7 +1,11 @@
 
-#CSV Table
+# CSV Table
 ## Available Scripts
 In the project directory, you can run:
+
+### Adding users
+To add a user to the database, you need to add information to the src/users.scv
+Format: id, adminId, name, avatar-src
 
 ### `npm start`
 Runs the app in the development mode.\
