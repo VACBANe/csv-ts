@@ -25,6 +25,7 @@ export const GetDateInterval = async (data: dataType) => {
             {
                 headers: {
                     'Content-type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
                 },
             }
         )
