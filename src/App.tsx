@@ -10,7 +10,7 @@ import TotalRow from './components/TotalRow';
 import { dataType, IDataBase, IPerson, IVacations } from './@types/types';
 
 // @ts-ignore
-import blob from './hello.csv';
+import blob from './users.csv';
 import { GetDateInterval } from './utils/GetDateInterval';
 import { FormatVacations } from './utils/FormatVacations';
 import { calculateSum } from './utils/CalculateSum';
