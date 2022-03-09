@@ -16,6 +16,7 @@ import { FormatVacations } from './utils/FormatVacations';
 import { calculateSum } from './utils/CalculateSum';
 import MainRows from './components/MainRows';
 import { FormatPersonsAndContracts } from './utils/FormatPersonsAndContracts';
+import {DropHere} from "./components/DropHere";
 
 function App() {
     const [selectedFile, setSelectedFile] = useState();
@@ -88,7 +89,7 @@ function App() {
                     setSelectedFile(files[0])
                 }
             />
-            {selectedFile && (
+            {selectedFile ? (
                 <TableWrapper>
                     <tbody>
                         <Header vacations={vacations} />
@@ -103,7 +104,7 @@ function App() {
                         />
                     </tbody>
                 </TableWrapper>
-            )}
+            ): <DropHere style={{opacity: 0.1}}>Drop here</DropHere>}
         </div>
     );
 }

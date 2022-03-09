@@ -16,8 +16,8 @@ export const GetDateInterval = async (data: dataType) => {
     )}/${dateMax.getFullYear()}`;
     const response = await axios
         .post(
-            // 'https://api.lambda.direct/search/off-days',
-            '#',
+            'https://api.lambda.direct/search/off-days',
+            // '#',
             {
                 from: min,
                 to: max,

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {DropHere} from "./components/DropHere";
 
 type IProps = Record<string, unknown>;
 class DragAndDrop extends Component<IProps, { drag: boolean }> {
@@ -63,24 +64,9 @@ class DragAndDrop extends Component<IProps, { drag: boolean }> {
         return (
             <div>
                 {this.state.drag && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100vw',
-                            height: '100vh',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: '5em',
-                            color: '#000',
-                            backgroundColor: 'grey',
-                            opacity: 0.4,
-                        }}
-                    >
+                    <DropHere>
                         Drop here
-                    </div>
+                    </DropHere>
                 )}
                 {this.props.children}
             </div>
