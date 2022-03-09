@@ -1,10 +1,11 @@
-const changeDateAndTimeFormat = ([...data]: any[]) => {
+import {dataType} from "../@types/types";
+const changeDateAndTimeFormat = (data: dataType) => {
     return data.map((item) => {
-        item[0] = item[0].split('.');
-        const temp = item[0][0];
-        item[0][0] = item[0][1];
-        item[0][1] = temp;
-        const day = new Date(item[0].join('')).getDay();
+        const date = item[0].toString().split('.');
+        const temp = date[0];
+        date[0] = date[1];
+        date[1] = temp;
+        const day = new Date(date.join('')).getDay();
         item[0] = day === 0 ? 7 : day;
         const time = item[3];
         const timestamp = +(+time).toFixed(2) * 60;

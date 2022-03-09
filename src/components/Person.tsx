@@ -1,10 +1,11 @@
 import { NameBlock } from './Name';
 import React from 'react';
 import styled from 'styled-components';
+import {IPerson} from "../@types/types";
 
 interface Props {
     index: number;
-    item: any;
+    item: IPerson;
 }
 const Person: React.FC<Props> = ({ index, item }) => {
     return (
@@ -27,14 +28,14 @@ const Id = styled.div`
   color: red;
   font-size: 11px;
 `;
-const Avatar = styled.img<{ avatarSrc: string | null }>`
+const Avatar = styled.img<{ avatarSrc: string | undefined }>`
     border: ${({ avatarSrc }) => (avatarSrc ? '' : '1px solid red')};
     width: 30px;
     height: 30px;
     border-radius: 50%;
     margin: 8px;
 `;
-const Name = styled.div<{ avatarSrc: string | null }>`
+const Name = styled.div<{ avatarSrc: string | undefined }>`
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
     font-size: 12px;

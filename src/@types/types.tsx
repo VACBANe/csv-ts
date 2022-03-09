@@ -6,7 +6,7 @@ export interface IPerson {
     contracts: IContract[];
     totalHours: number[];
     totalMoney: number;
-    avatar: string| null;
+    avatar: string| undefined;
 }
 export interface IContract {
     name: string;

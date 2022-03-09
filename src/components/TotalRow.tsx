@@ -3,11 +3,12 @@ import TotalForTheWeek from './TotalForTheWeek';
 import React from 'react';
 import HoursAndDollars from './HoursAndDollars';
 import styled from 'styled-components';
+import {IVacations} from "../@types/types";
 
 interface Props {
     weekMoney: number[];
     weekHours: number[][];
-    vacations: any;
+    vacations: IVacations;
 }
 
 const TotalRow: React.FC<Props> = ({ weekMoney, weekHours, vacations }) => {
@@ -21,7 +22,7 @@ const TotalRow: React.FC<Props> = ({ weekMoney, weekHours, vacations }) => {
                 let holiday = false;
                 vacations &&
                     vacations.holidays &&
-                    vacations.holidays.forEach((it: any) => {
+                    vacations.holidays.forEach((it) => {
                         if (
                             (new Date(it.date).getDay() === 0
                                 ? 7
@@ -35,9 +36,9 @@ const TotalRow: React.FC<Props> = ({ weekMoney, weekHours, vacations }) => {
                     <Holiday key={index}>
                         <HoursAndDollars time={weekHours[index]} money={item} />
                     </Holiday>
-                ) : <Block key={index}>
+                ) : <td key={index}>
                     <HoursAndDollars time={weekHours[index]} money={item} />
-                </Block>;
+                </td>;
             })}
             <TotalForTheWeek weekMoney={weekMoney} weekHours={weekHours} />
         </tr>
@@ -49,8 +50,6 @@ const TotalRowBlock = styled.div`
 `;
 const Holiday = styled.td`
   background: repeating-linear-gradient( -45deg, #f0f0f0, #f0f0f0 2px, #f8f8f8 2px, #f8f8f8 6px );
-`;
-const Block = styled.td`
 `;
 
 export default TotalRow;

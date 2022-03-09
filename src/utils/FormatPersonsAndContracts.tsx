@@ -8,7 +8,7 @@ export const FormatPersonsAndContracts = (
     database: IDataBase
 ) => {
     const findObj = (id: string) =>
-        database[id]?.avatar ? database[id].avatar : null;
+        database[id]?.avatar ? database[id].avatar : undefined;
     const findId = (id: string) =>
         database[id]?.adminId ? database[id].adminId : '0';
     let uniquePersons: string[] = [];

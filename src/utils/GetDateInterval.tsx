@@ -1,7 +1,8 @@
 import axios from 'axios';
+import {dataType} from "../@types/types";
 
-export const GetDateInterval = async (data: any) => {
-    const array = data.map((item: any) => new Date(item[0]).getTime());
+export const GetDateInterval = async (data: dataType) => {
+    const array = data.map((item) => new Date(item[0]).getTime());
     const dateMin = new Date(Math.min.apply(null, array));
     const dateMax = new Date(Math.max.apply(null, array));
     const lowerThatNull = (num: number) => {

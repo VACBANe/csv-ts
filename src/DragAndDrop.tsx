@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-class DragAndDrop extends Component<{}, { drag: boolean }> {
+type IProps = Record<string, unknown>;
+class DragAndDrop extends Component<IProps, { drag: boolean }> {
     dragCounter: number;
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
         this.state = {
             drag: false,

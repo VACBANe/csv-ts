@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { SetStateAction, useEffect, useState } from 'react';
-import Papa from 'papaparse';
+import Papa, { ParseResult } from 'papaparse';
 
 import './App.css';
 import DragAndDrop from './DragAndDrop';
@@ -61,12 +61,14 @@ function App() {
     useEffect(() => {
         if (selectedFile) {
             Papa.parse(selectedFile, {
-                complete: async function (results) {
-                    await GetDateInterval(results.data).then((res) => {
+                complete: async function ({
+                    data,
+                }: ParseResult<[number, string, string, number[], string]>) {
+                    await GetDateInterval(data).then((res) => {
                         if (res !== undefined)
                             setVacations(FormatVacations(res));
                     });
-                    setData(changeDateAndTimeFormat(results.data));
+                    setData(changeDateAndTimeFormat(data));
                 },
             });
         }
@@ -82,7 +84,6 @@ function App() {
     return (
         <div className="App">
             <DragAndDrop
-                /*@ts-ignore*/
                 handleDrop={(files: SetStateAction<undefined>[]) =>
                     setSelectedFile(files[0])
                 }
