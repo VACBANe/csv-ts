@@ -1,19 +1,19 @@
 import React from 'react';
 import HoursAndDollars from './HoursAndDollars';
-import { IContract } from '../@types/types';
+import {IContract, IVacations} from '../@types/types';
 import styled from 'styled-components';
 
 const DatesFunc = (
     contract: IContract,
     day: number,
     personId: string,
-    vacations: any,
+    vacations: IVacations,
     index: number,
     contractNum: number
 ) => {
     const element = contract.dates.find((item) => item.date === day);
     let isHoliday = false;
-    vacations.holidays.forEach((it: { date: string | number | Date }) => {
+    vacations.holidays.forEach((it) => {
         if (
             (new Date(it.date).getDay() === 0
                 ? 7
@@ -23,7 +23,8 @@ const DatesFunc = (
         }
     });
     for (const key in vacations) {
-        const vacation = vacations[key].find((vac: any) => {
+        // @ts-ignore
+        const vacation = vacations[key].find((vac) => {
             if (vac.date) {
                 return (
                     vac.personId === personId &&

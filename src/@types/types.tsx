@@ -1,3 +1,4 @@
+export type dataType = Array<[number, string, string, number[], string]>;
 export interface IPerson {
     adminId: string;
     name: string;
@@ -27,7 +28,22 @@ export interface IDataBase {
     }
 }
 export interface IVacations {
-    holidays: object[];
-    sickLeaves: object[];
-    vacations: object[];
+    holidays: Holiday[];
+    sickLeaves: OneDayOff[] | FewDaysOff[];
+    vacations: OneDayOff[] | FewDaysOff[];
+}
+
+export interface Holiday {
+    name: string;
+    date: string;
+}
+export interface DayOff {
+    personId: string;
+}
+export interface OneDayOff extends DayOff {
+    date: string;
+}
+export interface FewDaysOff extends DayOff {
+    startDate: string;
+    endDate: string;
 }

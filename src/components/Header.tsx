@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import VacationBlock from './VacationBlock';
+import {IVacations} from "../@types/types";
 
 interface Props {
-    vacations: any;
+    vacations: IVacations;
 }
 
 const Header: React.FC<Props> = ({ vacations }) => {
@@ -15,7 +16,7 @@ const Header: React.FC<Props> = ({ vacations }) => {
             let holidayName = '';
             vacations &&
                 vacations.holidays &&
-                vacations.holidays.forEach((it: any) => {
+                vacations.holidays.forEach((it) => {
                     if (
                         (new Date(it.date).getDay() === 0
                             ? 7

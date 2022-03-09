@@ -1,27 +1,22 @@
-interface VacationDay {
-    holidays: Array<Holiday>;
-    vacations: Array<Vacation>;
-    sickLeaves: Array<Vacation>;
-}
-interface Vacation {
+import {IVacations} from "../@types/types";
+
+interface Props {
+    userId?: string;
     date?: string;
     startDate?: string;
     endDate?: string;
-    personId: string;
-}
-interface Holiday {
-    name: string;
-    date: string;
+    name?: string
 }
 
-export const FormatVacations = (arr: any) => {
-    const resultArray: VacationDay = {
+export const FormatVacations = (arr: IVacations) => {
+    const resultArray: IVacations = {
         vacations: [],
         holidays: [],
         sickLeaves: [],
     };
     for (const key in arr) {
-        arr[key].forEach((day: any) => {
+        // @ts-ignore
+        arr[key].forEach((day: Props) => {
             if (key === 'holidays' && day.date && day.name) {
                 const date = day.date.split('/').reverse().join('.');
                 resultArray[key].push({
